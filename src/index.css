@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-espresso: #0D0603;
+  --color-cacao: #2A1206;
+  --color-forest: #0F1A0F;
+  --color-charcoal: #141416;
+  --color-ivory: #F5F0E8;
+  --color-champagne: #F0E2C0;
+  --color-pale-gold: #C9A84C;
+  --color-cream: #E0D0B0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-espresso);
+  color: var(--color-ivory);
+  font-family: 'Cormorant Garamond', Garamond, serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0D0603;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A84C44;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A84C88;
+}
+
+/* Smooth section transitions */
+section {
+  position: relative;
+}
+
+/* Slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  height: 1px;
+  background: rgba(201, 168, 76, 0.3);
+  border-radius: 1px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #C9A84C;
+  border-radius: 50%;
+  margin-top: -6px;
+  transition: box-shadow 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 1px;
+  background: rgba(201, 168, 76, 0.3);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #C9A84C;
+  border-radius: 50%;
+  border: none;
+}
+
+/* Gold line decoration */
+.gold-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C9A84C, transparent);
+}
+
+/* Section label style */
+.section-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #C9A84C;
+  opacity: 0.8;
+}
+
+/* Cinematic fade-in utility */
+.cinematic-text {
+  font-family: 'Playfair Display', Georgia, serif;
+}
