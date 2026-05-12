@@ -16,6 +16,34 @@ const COFFEE_ORIGINS = [
 
 const ROAST_LEVELS = ['Light', 'Medium', 'Dark']
 
+const COFFEE_PRICES = { 100: 4, 250: 9, 500: 16, 1000: 30 }
+
+function PriceTag({ price, sublabel }) {
+  return (
+    <div className="text-center">
+      <motion.div
+        key={price}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="flex items-baseline justify-center gap-1"
+      >
+        <span
+          className="text-[#C9A84C]"
+          style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(2.2rem,7vw,3rem)', fontWeight: 300 }}
+        >
+          {price}
+        </span>
+        <span
+          className="text-[#C9A84C] opacity-70"
+          style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem' }}
+        >€</span>
+      </motion.div>
+      {sublabel && <div className="section-label text-[0.55rem] mt-1 opacity-60">{sublabel}</div>}
+    </div>
+  )
+}
+
 function getBeanColor(roast) {
   const light = { r: 188, g: 128, b: 65 }
   const dark = { r: 25, g: 10, b: 4 }
@@ -213,6 +241,8 @@ export default function CoffeeExperience() {
                   ))}
                 </div>
               </div>
+
+              <PriceTag price={COFFEE_PRICES[quantity]} sublabel={`${quantity >= 1000 ? '1 kg' : quantity + 'g'} bag`} />
             </div>
           </FadeIn>
 

@@ -31,6 +31,28 @@ const CACAO_VARIETIES = [
   },
 ]
 
+// Tablet sizes: label shown to user, weight in grams, price multiplier vs 100g base
+const TABLET_SIZES = [
+  { id: '50',  label: '50g',  multiplier: 0.60 },
+  { id: '100', label: '100g', multiplier: 1.00 },
+  { id: '200', label: '200g', multiplier: 1.80 },
+]
+
+// Price per 100g tablet: 3 € (milk) → 10 € (extra brut), linear with tone 0–100
+function calcBasePrice(tone) {
+  return 3 + 7 * (tone / 100)
+}
+
+// Round to nearest 0.50 for clean luxury pricing
+function roundHalf(n) {
+  return Math.round(n * 2) / 2
+}
+
+function calcPrice(tone, sizeId) {
+  const size = TABLET_SIZES.find((s) => s.id === sizeId) || TABLET_SIZES[1]
+  return roundHalf(calcBasePrice(tone) * size.multiplier)
+}
+
 function getChocolateColor(value) {
   const light = { r: 185, g: 118, b: 65 }
   const dark = { r: 35, g: 14, b: 5 }
@@ -85,46 +107,29 @@ function ChocolateBar({ tone }) {
   )
 }
 
-// Cacao pod with realistic mazorca ridges
 function CacaoPod({ variety }) {
   const v = CACAO_VARIETIES.find((x) => x.id === variety) || CACAO_VARIETIES[0]
-
   const podOutline = `
-    M 72,30
-    C 85,33 95,48 98,62
-    C 100,68  98,75  96,80
-    C 100,87 102,95 100,103
-    C 98,110  96,116  98,122
-    C 102,130 104,138 101,147
-    C 98,155  95,162  96,170
-    C 94,178  88,188  82,195
-    C 78,199  74,202  72,203
-    C 70,202  66,199  62,195
-    C 56,188  50,178  48,170
-    C 49,162  46,155  44,147
-    C 41,138  43,130  47,122
-    C 49,116  47,110  44,103
-    C 42,95  44,87  48,80
-    C 46,75  44,68  46,62
-    C 49,48  59,33  72,30 Z
+    M 72,30 C 85,33 95,48 98,62 C 100,68 98,75 96,80
+    C 100,87 102,95 100,103 C 98,110 96,116 98,122
+    C 102,130 104,138 101,147 C 98,155 95,162 96,170
+    C 94,178 88,188 82,195 C 78,199 74,202 72,203
+    C 70,202 66,199 62,195 C 56,188 50,178 48,170
+    C 49,162 46,155 44,147 C 41,138 43,130 47,122
+    C 49,116 47,110 44,103 C 42,95 44,87 48,80
+    C 46,75 44,68 46,62 C 49,48 59,33 72,30 Z
   `
   const ridgeOffsets = [-26, -13, 0, 13, 26]
   const grooves = ridgeOffsets.map((ox) => {
     const cx = 72 + ox
     return `M ${cx},34 C ${cx + ox * 0.1},90 ${cx + ox * 0.05},140 ${cx},198`
   })
-
   return (
-    <motion.svg
-      key={variety}
-      viewBox="0 0 144 230"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <motion.svg key={variety} viewBox="0 0 144 230" fill="none"
       className="w-full max-w-[130px] md:max-w-[110px]"
       initial={{ scale: 0.92, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-    >
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
       <defs>
         <radialGradient id={`podGlow_${variety}`} cx="50%" cy="45%" r="55%">
           <stop offset="0%" stopColor={v.podHighlight} stopOpacity="0.7" />
@@ -137,14 +142,11 @@ function CacaoPod({ variety }) {
       {grooves.map((d, i) => (
         <path key={i} d={d} stroke={v.podShadow}
           strokeWidth={i === 2 ? '2.2' : '1.4'}
-          opacity={i === 2 ? 0.55 : 0.35}
-          strokeLinecap="round" fill="none" />
+          opacity={i === 2 ? 0.55 : 0.35} strokeLinecap="round" fill="none" />
       ))}
       {[-20, -7, 7, 20].map((ox, i) => (
-        <path key={i}
-          d={`M ${72 + ox},36 C ${72 + ox},80 ${72 + ox},130 ${72 + ox},196`}
-          stroke={v.podHighlight} strokeWidth="0.8" opacity="0.2"
-          strokeLinecap="round" fill="none" />
+        <path key={i} d={`M ${72+ox},36 C ${72+ox},80 ${72+ox},130 ${72+ox},196`}
+          stroke={v.podHighlight} strokeWidth="0.8" opacity="0.2" strokeLinecap="round" fill="none" />
       ))}
       {[[58,70],[80,58],[90,95],[55,110],[85,130],[62,148],[78,165],[66,88],[82,108],[60,130]].map(([px,py],i) => (
         <circle key={i} cx={px} cy={py} r="1.2" fill={v.podShadow} opacity="0.3" />
@@ -157,17 +159,42 @@ function CacaoPod({ variety }) {
   )
 }
 
+// Animated price display — re-animates whenever price value changes
+function PriceTag({ price, sublabel }) {
+  return (
+    <div className="text-center">
+      <motion.div
+        key={price}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-baseline justify-center gap-1"
+      >
+        <span className="text-[#C9A84C]"
+          style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(2.2rem,7vw,3rem)', fontWeight: 300 }}>
+          {price % 1 === 0 ? `${price}` : price.toFixed(1)}
+        </span>
+        <span className="text-[#C9A84C] opacity-70"
+          style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem' }}>
+          €
+        </span>
+      </motion.div>
+      {sublabel && (
+        <div className="section-label text-[0.55rem] mt-1 opacity-60">{sublabel}</div>
+      )}
+    </div>
+  )
+}
+
 function FadeIn({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   return (
-    <motion.div
-      ref={ref}
+    <motion.div ref={ref}
       initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
+      className={className}>
       {children}
     </motion.div>
   )
@@ -176,16 +203,13 @@ function FadeIn({ children, delay = 0, className = '' }) {
 export default function ChocolateExperience() {
   const [tone, setTone] = useState(65)
   const [variety, setVariety] = useState('criollo')
+  const [tabletSize, setTabletSize] = useState('100')
   const activeVariety = CACAO_VARIETIES.find((v) => v.id === variety)
+  const price = calcPrice(tone, tabletSize)
 
   return (
-    <section
-      id="chocolate"
-      className="relative py-16 md:py-40 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #0D0603 0%, #1A0800 40%, #120500 100%)',
-      }}
-    >
+    <section id="chocolate" className="relative py-16 md:py-40 overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0D0603 0%, #1A0800 40%, #120500 100%)' }}>
       <svg className="absolute top-0 right-0 w-96 opacity-[0.04] pointer-events-none"
         viewBox="0 0 400 400" fill="none">
         <circle cx="300" cy="100" r="150" stroke="#C9A84C" strokeWidth="0.5" />
@@ -208,34 +232,29 @@ export default function ChocolateExperience() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center">
 
-          {/* ── Chocolate bar + slider ── */}
+          {/* ── Chocolate bar + tone + size ── */}
           <FadeIn delay={0.1}>
             <div className="flex flex-col items-center gap-8 md:gap-10">
               <div className="flex items-center justify-center w-full">
                 <ChocolateBar tone={tone} />
               </div>
 
+              {/* Tone slider */}
               <div className="w-full max-w-sm">
                 <div className="flex justify-between items-center mb-2">
                   <span className="section-label text-[0.6rem]">Milk</span>
-                  <motion.span
-                    key={getChocolateLabel(tone)}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <motion.span key={getChocolateLabel(tone)}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="text-[#C9A84C] text-sm tracking-widest"
-                    style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                  >
+                    style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                     {getChocolateLabel(tone)}
                   </motion.span>
                   <span className="section-label text-[0.6rem]">Dark</span>
                 </div>
-                {/* py-2 wrapper adds extra touch area above/below the track */}
                 <div className="py-1">
-                  <input
-                    type="range" min="0" max="100" value={tone}
+                  <input type="range" min="0" max="100" value={tone}
                     onChange={(e) => setTone(Number(e.target.value))}
-                    className="w-full" aria-label="Chocolate tone"
-                  />
+                    className="w-full" aria-label="Chocolate tone" />
                 </div>
                 <div className="mt-2 h-px rounded-full transition-all duration-500"
                   style={{
@@ -243,9 +262,29 @@ export default function ChocolateExperience() {
                       ${getChocolateColor(0).fill},
                       ${getChocolateColor(50).fill},
                       ${getChocolateColor(100).fill})`,
-                  }}
-                />
+                  }} />
               </div>
+
+              {/* Tablet size selector */}
+              <div className="w-full max-w-sm">
+                <div className="section-label text-center mb-4">Tablet Size</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {TABLET_SIZES.map((s) => (
+                    <button key={s.id} onClick={() => setTabletSize(s.id)}
+                      className={`min-h-[44px] border text-sm tracking-widest transition-all duration-300 ${
+                        tabletSize === s.id
+                          ? 'border-[#C9A84C] text-[#C9A84C]'
+                          : 'border-[#F5F0E8]/15 text-[#F5F0E8]/35 hover:border-[#F5F0E8]/35'
+                      }`}
+                      style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price */}
+              <PriceTag price={price} sublabel="per tablet" />
             </div>
           </FadeIn>
 
@@ -257,21 +296,16 @@ export default function ChocolateExperience() {
               </div>
 
               <div className="w-full max-w-sm">
-                <div className="section-label text-center mb-5">Select Variety</div>
-                {/* flex-wrap in case screen is very narrow */}
+                <div className="section-label text-center mb-5">Cacao Variety</div>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {CACAO_VARIETIES.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setVariety(v.id)}
-                      /* min-h-[44px] ensures 44px tap target on iOS */
+                    <button key={v.id} onClick={() => setVariety(v.id)}
                       className={`relative min-h-[44px] px-5 py-2 text-[0.68rem] tracking-widest uppercase transition-all duration-300 border ${
                         variety === v.id
                           ? 'border-[#C9A84C] text-[#C9A84C]'
-                          : 'border-[#F5F0E8]/15 text-[#F5F0E8]/38 hover:border-[#F5F0E8]/40 hover:text-[#F5F0E8]/65'
+                          : 'border-[#F5F0E8]/15 text-[#F5F0E8]/38 hover:border-[#F5F0E8]/40'
                       }`}
-                      style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                    >
+                      style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                       {variety === v.id && (
                         <motion.div layoutId="variety-indicator"
                           className="absolute inset-0 bg-[#C9A84C]/6" />
@@ -281,14 +315,11 @@ export default function ChocolateExperience() {
                   ))}
                 </div>
 
-                <motion.p
-                  key={variety}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <motion.p key={variety}
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   className="mt-5 text-center text-[#9A7868] text-sm leading-relaxed"
-                  style={{ fontFamily: 'Cormorant Garamond, serif' }}
-                >
+                  style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                   {activeVariety.note}
                 </motion.p>
               </div>

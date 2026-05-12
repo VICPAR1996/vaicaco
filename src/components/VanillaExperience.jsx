@@ -12,6 +12,37 @@ const VANILLA_ORIGINS = [
     note: 'Caribbean foothills. Fruity brightness, warm floral notes.' },
 ]
 
+const VANILLA_GRADES = [
+  { id: 'A', label: 'Grade A', sublabel: 'Gourmet · Prime pods', price: 4.50 },
+  { id: 'B', label: 'Grade B', sublabel: 'Culinary · Rich extract', price: 2.50 },
+]
+
+function PriceTag({ price, sublabel }) {
+  return (
+    <div className="text-center">
+      <motion.div
+        key={price}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="flex items-baseline justify-center gap-1"
+      >
+        <span
+          className="text-[#C9A84C]"
+          style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(2.2rem,7vw,3rem)', fontWeight: 300 }}
+        >
+          {price % 1 === 0 ? `${price}` : price.toFixed(2)}
+        </span>
+        <span
+          className="text-[#C9A84C] opacity-70"
+          style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem' }}
+        >€</span>
+      </motion.div>
+      {sublabel && <div className="section-label text-[0.55rem] mt-1 opacity-60">{sublabel}</div>}
+    </div>
+  )
+}
+
 const MATURITY_LABELS = [
   { max: 25, label: 'Green · Fresh Harvest' },
   { max: 50, label: 'Early Cured' },
@@ -151,6 +182,10 @@ export default function VanillaExperience() {
   const [maturity, setMaturity] = useState(50)
   const [quantity, setQuantity] = useState(5)
   const [origin, setOrigin] = useState('amazonia')
+  const [grade, setGrade] = useState('A')
+
+  const activeGrade = VANILLA_GRADES.find((g) => g.id === grade)
+  const totalPrice = Math.round(activeGrade.price * quantity * 100) / 100
 
   const activeOrigin = VANILLA_ORIGINS.find((o) => o.id === origin)
 
@@ -223,6 +258,28 @@ export default function VanillaExperience() {
                 />
               </div>
 
+              {/* Grade selector */}
+              <div className="w-full max-w-sm">
+                <div className="section-label text-center mb-4">Grade</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {VANILLA_GRADES.map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setGrade(g.id)}
+                      className={`min-h-[56px] px-3 py-3 border transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
+                        grade === g.id
+                          ? 'border-[#C9A84C] text-[#C9A84C]'
+                          : 'border-[#F5F0E8]/15 text-[#F5F0E8]/35 hover:border-[#F5F0E8]/35'
+                      }`}
+                      style={{ fontFamily: 'Cormorant Garamond, serif' }}
+                    >
+                      <span className="text-sm tracking-widest uppercase">{g.label}</span>
+                      <span className="text-[0.6rem] opacity-60 tracking-wide">{g.sublabel}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Quantity — 48px buttons */}
               <div className="w-full max-w-sm">
                 <div className="section-label text-center mb-4">Quantity — Pods</div>
@@ -246,6 +303,11 @@ export default function VanillaExperience() {
                   >+</button>
                 </div>
               </div>
+
+              <PriceTag
+                price={totalPrice}
+                sublabel={`${quantity} pod${quantity > 1 ? 's' : ''} · ${activeGrade.label} · ${activeGrade.price.toFixed(2)}€/pod`}
+              />
             </div>
           </FadeIn>
 
