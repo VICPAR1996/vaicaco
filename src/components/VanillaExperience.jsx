@@ -35,7 +35,6 @@ function getVanillaColors(maturity) {
   }
 }
 
-// ─── SVG Vanilla Pod ──────────────────────────────────────────────────────
 function VanillaPod({ maturity }) {
   const c = getVanillaColors(maturity)
   const podBody = `
@@ -49,7 +48,8 @@ function VanillaPod({ maturity }) {
     C 28,42 32,26 38,22 Z
   `
   return (
-    <motion.svg viewBox="0 0 80 225" fill="none" className="w-full max-w-[64px]">
+    <motion.svg viewBox="0 0 80 225" fill="none"
+      className="w-full max-w-[80px] md:max-w-[64px]">
       <defs>
         <radialGradient id="vanillaGrad" cx="35%" cy="35%" r="65%">
           <stop offset="0%" stopColor={c.highlight} stopOpacity="0.55" />
@@ -81,10 +81,10 @@ function VanillaPod({ maturity }) {
   )
 }
 
-// ─── Simple Colombia map — outline + origin dots ──────────────────────────
+// Simple Colombia map with enlarged tap targets
 function VanillaMap({ selectedOrigin, onSelect }) {
   return (
-    <div className="relative w-full max-w-[240px] mx-auto">
+    <div className="relative w-full max-w-[280px] mx-auto">
       <svg viewBox="0 0 120 140" fill="none" className="w-full">
         <path
           d="M60 4 L72 6 L82 10 L88 16 L90 24 L86 28 L90 34 L92 42 L88 50
@@ -92,10 +92,7 @@ function VanillaMap({ selectedOrigin, onSelect }) {
              L56 116 L52 124 L50 132 L46 130 L44 122 L40 114 L36 108
              L32 100 L28 92 L24 84 L22 76 L20 68 L18 60 L16 52 L20 44
              L22 38 L18 30 L20 22 L24 16 L32 10 L42 6 Z"
-          fill="#0D1208"
-          stroke="#C9A84C"
-          strokeWidth="0.6"
-          strokeOpacity="0.3"
+          fill="#0D1208" stroke="#C9A84C" strokeWidth="0.6" strokeOpacity="0.3"
         />
         {VANILLA_ORIGINS.map((origin) => {
           const x = (origin.x / 100) * 120
@@ -104,27 +101,25 @@ function VanillaMap({ selectedOrigin, onSelect }) {
           return (
             <g key={origin.id} onClick={() => onSelect(origin.id)} style={{ cursor: 'pointer' }}>
               {isActive && (
-                <motion.circle
-                  cx={x} cy={y} r="6" fill="none" stroke="#C9A84C" strokeWidth="0.8"
+                <motion.circle cx={x} cy={y} r="8" fill="none"
+                  stroke="#C9A84C" strokeWidth="0.8"
                   initial={{ r: 3, opacity: 0.5 }}
-                  animate={{ r: 8, opacity: 0 }}
+                  animate={{ r: 9, opacity: 0 }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 />
               )}
-              <circle
-                cx={x} cy={y}
-                r={isActive ? 3.5 : 2.5}
+              <circle cx={x} cy={y} r={isActive ? 4 : 3}
                 fill={isActive ? '#C9A84C' : '#E8DCC8'}
-                opacity={isActive ? 1 : 0.3}
+                opacity={isActive ? 1 : 0.35}
                 className="transition-all duration-300"
               />
-              <text
-                x={x + 5} y={y + 1}
-                fontSize="4.5"
+              {/* Invisible large tap target */}
+              <circle cx={x} cy={y} r="10" fill="transparent" />
+              <text x={x + 6} y={y + 1.5} fontSize="5"
                 fill={isActive ? '#C9A84C' : '#E8DCC8'}
-                opacity={isActive ? 0.9 : 0.25}
+                opacity={isActive ? 0.9 : 0.28}
                 fontFamily="Cormorant Garamond, serif"
-                className="select-none"
+                className="select-none pointer-events-none"
               >
                 {origin.name}
               </text>
@@ -138,11 +133,11 @@ function VanillaMap({ selectedOrigin, onSelect }) {
 
 function FadeIn({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const inView = useInView(ref, { once: true, margin: '-60px' })
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
@@ -162,7 +157,7 @@ export default function VanillaExperience() {
   return (
     <section
       id="vanilla"
-      className="relative py-32 md:py-40 overflow-hidden"
+      className="relative py-16 md:py-40 overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #050B05 0%, #0C0A04 50%, #090704 100%)',
       }}
@@ -174,28 +169,31 @@ export default function VanillaExperience() {
         ))}
       </svg>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-5 md:px-12">
         <FadeIn>
-          <div className="mb-20">
+          <div className="mb-10 md:mb-20">
             <div className="section-label mb-4">03 — Vanilla</div>
-            <div className="gold-line mb-6" />
-            <h2 className="cinematic-text text-[clamp(2rem,5vw,4rem)] font-light text-[#F5F0E8] leading-tight max-w-lg">
+            <div className="gold-line mb-5" />
+            <h2 className="cinematic-text font-light text-[#F5F0E8] leading-tight max-w-lg"
+              style={{ fontSize: 'clamp(1.8rem, 6vw, 4rem)' }}>
               Wild-Grown<br />
               <span className="italic text-[#D4C890]">Colombian Vanilla</span>
             </h2>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-start">
 
-          {/* ── Vanilla pod + controls ── */}
+          {/* ── Pod + controls ── */}
           <FadeIn delay={0.1}>
-            <div className="flex flex-col items-center gap-12">
-              <VanillaPod maturity={maturity} />
+            <div className="flex flex-col items-center gap-8 md:gap-12">
+              <div className="flex items-center justify-center" style={{ minHeight: '180px' }}>
+                <VanillaPod maturity={maturity} />
+              </div>
 
               {/* Maturity slider */}
-              <div className="w-full max-w-xs">
-                <div className="flex justify-between items-center mb-4">
+              <div className="w-full max-w-sm">
+                <div className="flex justify-between items-center mb-2">
                   <span className="section-label text-[0.6rem]">Green</span>
                   <motion.span
                     key={getMaturityLabel(maturity)}
@@ -208,12 +206,14 @@ export default function VanillaExperience() {
                   </motion.span>
                   <span className="section-label text-[0.6rem]">Prime</span>
                 </div>
-                <input
-                  type="range" min="0" max="100" value={maturity}
-                  onChange={(e) => setMaturity(Number(e.target.value))}
-                  className="w-full" aria-label="Vanilla maturity"
-                />
-                <div className="mt-3 h-px rounded-full"
+                <div className="py-1">
+                  <input
+                    type="range" min="0" max="100" value={maturity}
+                    onChange={(e) => setMaturity(Number(e.target.value))}
+                    className="w-full" aria-label="Vanilla maturity"
+                  />
+                </div>
+                <div className="mt-2 h-px rounded-full"
                   style={{
                     background: `linear-gradient(to right,
                       ${getVanillaColors(0).fill},
@@ -223,15 +223,16 @@ export default function VanillaExperience() {
                 />
               </div>
 
-              {/* Quantity */}
-              <div className="w-full max-w-xs">
-                <div className="section-label text-center mb-5">Quantity — Pods</div>
+              {/* Quantity — 48px buttons */}
+              <div className="w-full max-w-sm">
+                <div className="section-label text-center mb-4">Quantity — Pods</div>
                 <div className="flex items-center justify-center gap-6">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 border border-[#F5F0E8]/18 text-[#F5F0E8]/45 hover:border-[#C9A84C]/55 hover:text-[#C9A84C] transition-all duration-300 text-lg"
+                    className="w-12 h-12 border border-[#F5F0E8]/18 text-[#F5F0E8]/45 hover:border-[#C9A84C]/55 hover:text-[#C9A84C] transition-all duration-300 text-xl"
+                    aria-label="Decrease quantity"
                   >−</button>
-                  <div className="text-center">
+                  <div className="text-center min-w-[48px]">
                     <div className="text-[#F5F0E8] text-2xl tracking-widest"
                       style={{ fontFamily: 'Playfair Display, serif' }}>
                       {quantity}
@@ -240,22 +241,23 @@ export default function VanillaExperience() {
                   </div>
                   <button
                     onClick={() => setQuantity(Math.min(20, quantity + 1))}
-                    className="w-10 h-10 border border-[#F5F0E8]/18 text-[#F5F0E8]/45 hover:border-[#C9A84C]/55 hover:text-[#C9A84C] transition-all duration-300 text-lg"
+                    className="w-12 h-12 border border-[#F5F0E8]/18 text-[#F5F0E8]/45 hover:border-[#C9A84C]/55 hover:text-[#C9A84C] transition-all duration-300 text-xl"
+                    aria-label="Increase quantity"
                   >+</button>
                 </div>
               </div>
             </div>
           </FadeIn>
 
-          {/* ── Map + origin info ── */}
+          {/* ── Map + origin ── */}
           <FadeIn delay={0.2}>
-            <div className="flex flex-col items-center gap-8">
-              <div className="section-label mb-0">Select Origin</div>
+            <div className="flex flex-col items-center gap-6 md:gap-8">
+              <div className="section-label">Select Origin</div>
               <VanillaMap selectedOrigin={origin} onSelect={setOrigin} />
 
               <motion.div
                 key={origin}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="text-center max-w-xs"
@@ -270,15 +272,16 @@ export default function VanillaExperience() {
                 </p>
               </motion.div>
 
-              <div className="flex flex-wrap gap-2 justify-center">
+              {/* Region pills — 2-col grid on mobile */}
+              <div className="w-full max-w-sm grid grid-cols-2 sm:flex sm:flex-wrap gap-2 justify-center">
                 {VANILLA_ORIGINS.map((o) => (
                   <button
                     key={o.id}
                     onClick={() => setOrigin(o.id)}
-                    className={`px-3 py-1.5 text-[0.65rem] tracking-widest uppercase border transition-all duration-300 ${
+                    className={`min-h-[44px] px-3 py-2 text-[0.65rem] tracking-widest uppercase border transition-all duration-300 ${
                       origin === o.id
                         ? 'border-[#C9A84C] text-[#C9A84C]'
-                        : 'border-[#F5F0E8]/12 text-[#F5F0E8]/32 hover:border-[#F5F0E8]/30 hover:text-[#F5F0E8]/55'
+                        : 'border-[#F5F0E8]/12 text-[#F5F0E8]/32 hover:border-[#F5F0E8]/30'
                     }`}
                     style={{ fontFamily: 'Cormorant Garamond, serif' }}
                   >

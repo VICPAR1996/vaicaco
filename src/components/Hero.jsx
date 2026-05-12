@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 
-// Botanical line SVG decorations drawn inline as SVG paths
 function BotanicalLines() {
   return (
     <svg
@@ -12,24 +11,19 @@ function BotanicalLines() {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Left botanical branch */}
       <g opacity="0.12" stroke="#C9A84C" strokeWidth="0.8">
         <path d="M-40 600 Q 80 500 120 350 Q 160 200 100 80" />
         <path d="M120 350 Q 60 320 20 280" />
         <path d="M120 350 Q 90 290 110 240" />
         <path d="M100 200 Q 50 180 30 140" />
         <path d="M100 200 Q 130 170 120 130" />
-        {/* Leaf shapes */}
         <ellipse cx="20" cy="280" rx="22" ry="10" transform="rotate(-40 20 280)" />
         <ellipse cx="110" cy="240" rx="18" ry="8" transform="rotate(20 110 240)" />
         <ellipse cx="30" cy="140" rx="20" ry="9" transform="rotate(-50 30 140)" />
         <ellipse cx="120" cy="130" rx="16" ry="7" transform="rotate(30 120 130)" />
-        {/* Small berries */}
         <circle cx="25" cy="280" r="3" />
         <circle cx="115" cy="240" r="2.5" />
       </g>
-
-      {/* Right botanical branch */}
       <g opacity="0.12" stroke="#C9A84C" strokeWidth="0.8">
         <path d="M1480 700 Q 1360 600 1320 450 Q 1280 300 1340 160" />
         <path d="M1320 450 Q 1380 420 1420 380" />
@@ -43,8 +37,6 @@ function BotanicalLines() {
         <circle cx="1415" cy="380" r="3" />
         <circle cx="1325" cy="340" r="2.5" />
       </g>
-
-      {/* Bottom center botanical flourish */}
       <g opacity="0.08" stroke="#C9A84C" strokeWidth="0.6">
         <path d="M720 900 Q 720 820 720 780" />
         <path d="M720 820 Q 680 800 650 770" />
@@ -52,15 +44,11 @@ function BotanicalLines() {
         <ellipse cx="650" cy="770" rx="20" ry="8" transform="rotate(-30 650 770)" />
         <ellipse cx="790" cy="770" rx="20" ry="8" transform="rotate(30 790 770)" />
       </g>
-
-      {/* Scattered dots — spore-like texture */}
       {[...Array(20)].map((_, i) => (
-        <circle
-          key={i}
+        <circle key={i}
           cx={100 + i * 65 + (i % 3) * 20}
           cy={120 + (i % 5) * 140}
-          r="1"
-          fill="#C9A84C"
+          r="1" fill="#C9A84C"
           opacity={0.06 + (i % 4) * 0.02}
         />
       ))}
@@ -68,7 +56,6 @@ function BotanicalLines() {
   )
 }
 
-// Animated grain/noise overlay for cinematic texture
 function GrainOverlay() {
   return (
     <div
@@ -87,27 +74,28 @@ const sentence = {
   hidden: { opacity: 1 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.04, delayChildren: 0.8 },
+    transition: { staggerChildren: 0.03, delayChildren: 0.6 },
   },
 }
 const letter = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 }
 
 export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative flex flex-col items-center justify-center overflow-hidden"
+      /* 100dvh = dynamic viewport height — accounts for iOS Safari toolbar shrinking/growing */
       style={{
+        minHeight: '100dvh',
         background: 'radial-gradient(ellipse at 50% 40%, #1A0A00 0%, #0D0603 55%, #080402 100%)',
       }}
     >
       <BotanicalLines />
       <GrainOverlay />
 
-      {/* Radial gold glow behind text */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -116,31 +104,32 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
+      <div className="relative z-20 text-center px-6 max-w-4xl mx-auto w-full">
         {/* Origin label */}
         <motion.div
           initial={{ opacity: 0, letterSpacing: '0.2em' }}
           animate={{ opacity: 1, letterSpacing: '0.4em' }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="section-label mb-10"
+          className="section-label mb-6 md:mb-10"
         >
           Colombia · Single Origin
         </motion.div>
 
-        {/* Gold divider line */}
+        {/* Gold divider */}
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="gold-line mx-auto mb-10"
+          transition={{ duration: 1, delay: 0.4 }}
+          className="gold-line mx-auto mb-6 md:mb-10"
         />
 
-        {/* Main title — animated word by word */}
+        {/* Main title */}
         <motion.h1
           variants={sentence}
           initial="hidden"
           animate="visible"
-          className="cinematic-text text-[clamp(2.4rem,6vw,5.5rem)] font-light leading-[1.1] tracking-wide text-[#F5F0E8] mb-8"
+          className="cinematic-text font-light leading-[1.1] tracking-wide text-[#F5F0E8] mb-5 md:mb-8"
+          style={{ fontSize: 'clamp(2rem, 8vw, 5.5rem)' }}
         >
           {'Colombian Origins,'.split('').map((char, i) => (
             <motion.span key={i} variants={letter}>
@@ -148,25 +137,26 @@ export default function Hero() {
             </motion.span>
           ))}
           <br />
-          <motion.span
-            variants={letter}
-            className="italic text-[#E0D0B0]"
-          >
+          <span className="italic text-[#E0D0B0]">
             {'Crafted for the Rare Palate'.split('').map((char, i) => (
               <motion.span key={i} variants={letter}>
                 {char === ' ' ? ' ' : char}
               </motion.span>
             ))}
-          </motion.span>
+          </span>
         </motion.h1>
 
         {/* Subtitle */}
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1.8 }}
-          className="text-[#C9A898] font-light text-[clamp(1rem,2vw,1.35rem)] tracking-wide max-w-xl mx-auto leading-relaxed"
-          style={{ fontFamily: 'Cormorant Garamond, serif' }}
+          transition={{ duration: 1, delay: 1.6 }}
+          className="text-[#C9A898] font-light tracking-wide mx-auto leading-relaxed"
+          style={{
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: 'clamp(1rem, 3.5vw, 1.35rem)',
+            maxWidth: '32ch',
+          }}
         >
           Coffee, cacao and vanilla from selected Colombian terroirs.
         </motion.p>
@@ -175,24 +165,21 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2.5, duration: 1 }}
-          className="mt-20 flex flex-col items-center gap-3"
+          transition={{ delay: 2.2, duration: 1 }}
+          className="mt-12 md:mt-20 flex flex-col items-center gap-3"
         >
           <span className="section-label text-[0.6rem]">Discover</span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-px h-10 bg-gradient-to-b from-[#C9A84C]/60 to-transparent"
+            className="w-px h-8 md:h-10 bg-gradient-to-b from-[#C9A84C]/60 to-transparent"
           />
         </motion.div>
       </div>
 
-      {/* Bottom gradient fade into next section */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-20"
-        style={{
-          background: 'linear-gradient(to bottom, transparent, #0D0603)',
-        }}
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-20"
+        style={{ background: 'linear-gradient(to bottom, transparent, #0D0603)' }}
       />
     </section>
   )

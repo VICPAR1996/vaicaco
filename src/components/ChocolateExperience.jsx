@@ -27,7 +27,7 @@ const CACAO_VARIETIES = [
     podHighlight: '#72A862',
     podShadow: '#1E3018',
     ribColor: '#2E4828',
-    note: 'Robust and earthy. Bold, full-bodied intensity from Colombia\'s lowland valleys.',
+    note: "Robust and earthy. Bold, full-bodied intensity from Colombia's lowland valleys.",
   },
 ]
 
@@ -49,7 +49,6 @@ function getChocolateLabel(value) {
   return 'Extra Brut · 90%'
 }
 
-// ─── SVG Chocolate Bar ────────────────────────────────────────────────────
 function ChocolateBar({ tone }) {
   const c = getChocolateColor(tone)
   return (
@@ -63,21 +62,10 @@ function ChocolateBar({ tone }) {
           <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor={c.shadow} floodOpacity="0.6" />
         </filter>
       </defs>
-
-      {/* Always-on ambient glow so bar stays visible in dark mode */}
-      <ellipse cx="140" cy="90" rx="130" ry="80"
-        fill={c.glow} opacity="0.18" style={{ filter: 'blur(18px)' }} />
-
-      {/* Bar body */}
       <rect x="10" y="10" width="260" height="160" rx="12" fill={c.shadow} filter="url(#barShadow)" />
       <rect x="14" y="14" width="252" height="152" rx="10" fill={c.fill} />
-
-      {/* Top sheen */}
       <rect x="14" y="14" width="252" height="28" rx="10" fill={c.highlight} opacity="0.22" />
-      {/* Left sheen */}
       <rect x="14" y="14" width="36" height="152" rx="10" fill={c.highlight} opacity="0.07" />
-
-      {/* Squares grid 4×3 */}
       {[0, 1, 2, 3].map((col) =>
         [0, 1, 2].map((row) => (
           <g key={`${col}-${row}`}>
@@ -88,8 +76,6 @@ function ChocolateBar({ tone }) {
           </g>
         ))
       )}
-
-      {/* Brand mark */}
       <text x="140" y="156" textAnchor="middle"
         fill={c.highlight} opacity="0.3" fontSize="7"
         fontFamily="Playfair Display, serif" letterSpacing="4">
@@ -99,13 +85,10 @@ function ChocolateBar({ tone }) {
   )
 }
 
-// ─── SVG Mazorca de Cacao ─────────────────────────────────────────────────
-// Realistic cacao pod silhouette with 10 longitudinal ridges
+// Cacao pod with realistic mazorca ridges
 function CacaoPod({ variety }) {
   const v = CACAO_VARIETIES.find((x) => x.id === variety) || CACAO_VARIETIES[0]
 
-  // Ridged pod outline — characteristic bumpy silhouette of a cacao pod
-  // The right edge has 5 outward lobes (ridges), mirrored on the left
   const podOutline = `
     M 72,30
     C 85,33 95,48 98,62
@@ -125,8 +108,6 @@ function CacaoPod({ variety }) {
     C 46,75  44,68  46,62
     C 49,48  59,33  72,30 Z
   `
-
-  // 5 ridge groove lines (dark creases running stem-to-tip)
   const ridgeOffsets = [-26, -13, 0, 13, 26]
   const grooves = ridgeOffsets.map((ox) => {
     const cx = 72 + ox
@@ -139,7 +120,7 @@ function CacaoPod({ variety }) {
       viewBox="0 0 144 230"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="w-full max-w-[110px]"
+      className="w-full max-w-[130px] md:max-w-[110px]"
       initial={{ scale: 0.92, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -149,85 +130,40 @@ function CacaoPod({ variety }) {
           <stop offset="0%" stopColor={v.podHighlight} stopOpacity="0.7" />
           <stop offset="100%" stopColor={v.podColor} stopOpacity="0" />
         </radialGradient>
-        <filter id="podBlur">
-          <feGaussianBlur stdDeviation="10" />
-        </filter>
       </defs>
-
-      {/* ── Persistent ambient light — always shows the pod shape ── */}
-      {/* This ensures visibility even at the darkest variety setting */}
-      <ellipse cx="72" cy="118" rx="46" ry="82"
-        fill={v.podHighlight} opacity="0.22" filter="url(#podBlur)" />
-      <ellipse cx="72" cy="118" rx="35" ry="68"
-        fill={v.glowColor} opacity="0.12" filter="url(#podBlur)" />
-
-      {/* Drop shadow */}
       <path d={podOutline} fill={v.podShadow} opacity="0.5" transform="translate(4,5)" />
-
-      {/* Main pod body */}
       <path d={podOutline} fill={v.podColor} />
-
-      {/* Surface highlight (radial gradient sheen) */}
       <path d={podOutline} fill={`url(#podGlow_${variety})`} opacity="0.4" />
-
-      {/* Longitudinal ridge grooves */}
       {grooves.map((d, i) => (
-        <path
-          key={i}
-          d={d}
-          stroke={v.podShadow}
+        <path key={i} d={d} stroke={v.podShadow}
           strokeWidth={i === 2 ? '2.2' : '1.4'}
           opacity={i === 2 ? 0.55 : 0.35}
-          strokeLinecap="round"
-          fill="none"
-        />
+          strokeLinecap="round" fill="none" />
       ))}
-
-      {/* Ridge highlight streaks (lighter edges of each ridge) */}
       {[-20, -7, 7, 20].map((ox, i) => (
-        <path
-          key={i}
+        <path key={i}
           d={`M ${72 + ox},36 C ${72 + ox},80 ${72 + ox},130 ${72 + ox},196`}
-          stroke={v.podHighlight}
-          strokeWidth="0.8"
-          opacity="0.2"
-          strokeLinecap="round"
-          fill="none"
-        />
+          stroke={v.podHighlight} strokeWidth="0.8" opacity="0.2"
+          strokeLinecap="round" fill="none" />
       ))}
-
-      {/* Surface texture dots — natural pod roughness */}
-      {[
-        [58, 70], [80, 58], [90, 95], [55, 110], [85, 130],
-        [62, 148], [78, 165], [66, 88], [82, 108], [60, 130],
-      ].map(([px, py], i) => (
-        <circle key={i} cx={px} cy={py} r="1.2"
-          fill={v.podShadow} opacity="0.3" />
+      {[[58,70],[80,58],[90,95],[55,110],[85,130],[62,148],[78,165],[66,88],[82,108],[60,130]].map(([px,py],i) => (
+        <circle key={i} cx={px} cy={py} r="1.2" fill={v.podShadow} opacity="0.3" />
       ))}
-
-      {/* Stem */}
-      <rect x="64" y="12" width="16" height="22" rx="7"
-        fill={v.ribColor} />
-      <ellipse cx="72" cy="30" rx="11" ry="5"
-        fill={v.podHighlight} opacity="0.35" />
-      {/* Stem attachment ridge */}
-      <ellipse cx="72" cy="33" rx="16" ry="6"
-        fill={v.podColor} opacity="0.6" />
-
-      {/* Tip */}
-      <ellipse cx="72" cy="200" rx="11" ry="5"
-        fill={v.podShadow} opacity="0.6" />
+      <rect x="64" y="12" width="16" height="22" rx="7" fill={v.ribColor} />
+      <ellipse cx="72" cy="30" rx="11" ry="5" fill={v.podHighlight} opacity="0.35" />
+      <ellipse cx="72" cy="33" rx="16" ry="6" fill={v.podColor} opacity="0.6" />
+      <ellipse cx="72" cy="200" rx="11" ry="5" fill={v.podShadow} opacity="0.6" />
     </motion.svg>
   )
 }
 
 function FadeIn({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const inView = useInView(ref, { once: true, margin: '-60px' })
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
@@ -245,12 +181,11 @@ export default function ChocolateExperience() {
   return (
     <section
       id="chocolate"
-      className="relative py-32 md:py-40 overflow-hidden"
+      className="relative py-16 md:py-40 overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #0D0603 0%, #1A0800 40%, #120500 100%)',
       }}
     >
-      {/* Decorative rings */}
       <svg className="absolute top-0 right-0 w-96 opacity-[0.04] pointer-events-none"
         viewBox="0 0 400 400" fill="none">
         <circle cx="300" cy="100" r="150" stroke="#C9A84C" strokeWidth="0.5" />
@@ -258,29 +193,30 @@ export default function ChocolateExperience() {
         <circle cx="300" cy="100" r="90" stroke="#C9A84C" strokeWidth="0.5" />
       </svg>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-5 md:px-12">
         <FadeIn>
-          <div className="mb-20">
+          <div className="mb-10 md:mb-20">
             <div className="section-label mb-4">01 — Cacao</div>
-            <div className="gold-line mb-6" />
-            <h2 className="cinematic-text text-[clamp(2rem,5vw,4rem)] font-light text-[#F5F0E8] leading-tight max-w-lg">
+            <div className="gold-line mb-5" />
+            <h2 className="cinematic-text font-light text-[#F5F0E8] leading-tight max-w-lg"
+              style={{ fontSize: 'clamp(1.8rem, 6vw, 4rem)' }}>
               The Dark<br />
               <span className="italic text-[#C9A898]">Art of Cacao</span>
             </h2>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center">
 
-          {/* ── Chocolate bar + tone slider ── */}
+          {/* ── Chocolate bar + slider ── */}
           <FadeIn delay={0.1}>
-            <div className="flex flex-col items-center gap-10">
+            <div className="flex flex-col items-center gap-8 md:gap-10">
               <div className="flex items-center justify-center w-full">
                 <ChocolateBar tone={tone} />
               </div>
 
-              <div className="w-full max-w-xs">
-                <div className="flex justify-between items-center mb-4">
+              <div className="w-full max-w-sm">
+                <div className="flex justify-between items-center mb-2">
                   <span className="section-label text-[0.6rem]">Milk</span>
                   <motion.span
                     key={getChocolateLabel(tone)}
@@ -293,12 +229,15 @@ export default function ChocolateExperience() {
                   </motion.span>
                   <span className="section-label text-[0.6rem]">Dark</span>
                 </div>
-                <input
-                  type="range" min="0" max="100" value={tone}
-                  onChange={(e) => setTone(Number(e.target.value))}
-                  className="w-full" aria-label="Chocolate tone"
-                />
-                <div className="mt-3 h-px rounded-full transition-all duration-500"
+                {/* py-2 wrapper adds extra touch area above/below the track */}
+                <div className="py-1">
+                  <input
+                    type="range" min="0" max="100" value={tone}
+                    onChange={(e) => setTone(Number(e.target.value))}
+                    className="w-full" aria-label="Chocolate tone"
+                  />
+                </div>
+                <div className="mt-2 h-px rounded-full transition-all duration-500"
                   style={{
                     background: `linear-gradient(to right,
                       ${getChocolateColor(0).fill},
@@ -310,21 +249,23 @@ export default function ChocolateExperience() {
             </div>
           </FadeIn>
 
-          {/* ── Cacao pod + variety selector ── */}
-          <FadeIn delay={0.2}>
-            <div className="flex flex-col items-center gap-10">
-              <div className="flex items-center justify-center h-60">
+          {/* ── Cacao pod + variety ── */}
+          <FadeIn delay={0.15}>
+            <div className="flex flex-col items-center gap-8 md:gap-10">
+              <div className="flex items-center justify-center" style={{ minHeight: '200px' }}>
                 <CacaoPod variety={variety} />
               </div>
 
-              <div className="w-full max-w-xs">
-                <div className="section-label text-center mb-6">Select Variety</div>
-                <div className="flex gap-3 justify-center">
+              <div className="w-full max-w-sm">
+                <div className="section-label text-center mb-5">Select Variety</div>
+                {/* flex-wrap in case screen is very narrow */}
+                <div className="flex flex-wrap gap-2 justify-center">
                   {CACAO_VARIETIES.map((v) => (
                     <button
                       key={v.id}
                       onClick={() => setVariety(v.id)}
-                      className={`relative px-4 py-2.5 text-[0.68rem] tracking-widest uppercase transition-all duration-400 border ${
+                      /* min-h-[44px] ensures 44px tap target on iOS */
+                      className={`relative min-h-[44px] px-5 py-2 text-[0.68rem] tracking-widest uppercase transition-all duration-300 border ${
                         variety === v.id
                           ? 'border-[#C9A84C] text-[#C9A84C]'
                           : 'border-[#F5F0E8]/15 text-[#F5F0E8]/38 hover:border-[#F5F0E8]/40 hover:text-[#F5F0E8]/65'
@@ -332,10 +273,8 @@ export default function ChocolateExperience() {
                       style={{ fontFamily: 'Cormorant Garamond, serif' }}
                     >
                       {variety === v.id && (
-                        <motion.div
-                          layoutId="variety-indicator"
-                          className="absolute inset-0 bg-[#C9A84C]/6"
-                        />
+                        <motion.div layoutId="variety-indicator"
+                          className="absolute inset-0 bg-[#C9A84C]/6" />
                       )}
                       {v.label}
                     </button>
@@ -347,7 +286,7 @@ export default function ChocolateExperience() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="mt-6 text-center text-[#9A7868] text-sm leading-relaxed"
+                  className="mt-5 text-center text-[#9A7868] text-sm leading-relaxed"
                   style={{ fontFamily: 'Cormorant Garamond, serif' }}
                 >
                   {activeVariety.note}
