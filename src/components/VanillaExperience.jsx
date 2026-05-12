@@ -1,15 +1,14 @@
 import React, { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import ColombiaMap from './ColombiaMap'
 
 const VANILLA_ORIGINS = [
   { id: 'sierra-nevada', name: 'Sierra Nevada', x: 62, y: 12,
     note: 'Mountain-grown vanilla. Delicate floral tones, woody base note.' },
-  { id: 'amazonia', name: 'Amazonía', x: 65, y: 82,
+  { id: 'amazonia', name: 'Amazonía', x: 68, y: 75,
     note: 'Dense tropical rainforest. Rich, creamy, intensely complex.' },
-  { id: 'choco', name: 'Chocó', x: 13, y: 42,
+  { id: 'choco', name: 'Chocó', x: 20, y: 45,
     note: 'Pacific rainforest. Dark, smoky, raisin and rum undertones.' },
-  { id: 'magdalena', name: 'Magdalena', x: 60, y: 18,
+  { id: 'magdalena', name: 'Magdalena', x: 55, y: 22,
     note: 'Caribbean foothills. Fruity brightness, warm floral notes.' },
 ]
 
@@ -33,29 +32,12 @@ function getVanillaColors(maturity) {
     highlight: `rgb(${Math.round(135 + (78 - 135) * t)},${Math.round(152 + (48 - 152) * t)},${Math.round(58 + (18 - 58) * t)})`,
     shadow: `rgb(${Math.round(48 + (16 - 48) * t)},${Math.round(58 + (9 - 58) * t)},${Math.round(18 + (3 - 18) * t)})`,
     bloomOpacity: Math.max(0, (maturity - 60) / 40) * 0.45,
-    // Glow base that stays warm even at full dark
-    glowR: Math.round(120 + (80 - 120) * t),
-    glowG: Math.round(100 + (50 - 100) * t),
-    glowB: Math.round(30 + (15 - 30) * t),
   }
 }
 
 // ─── SVG Vanilla Pod ──────────────────────────────────────────────────────
 function VanillaPod({ maturity }) {
   const c = getVanillaColors(maturity)
-
-  // The pod has a slight natural curve
-  const podPath = `
-    M 40,22
-    C 46,26 50,42 51,65
-    C 52,88 51,115 50,140
-    C 49,162 46,180 42,196
-    C 40,200 39,202 40,204
-    C 41,202 42,200 44,196
-    C 48,180 51,162 52,140
-    C 53,115 54,88 53,65
-    C 52,42 48,26 42,22 Z
-  `
   const podBody = `
     M 40,22
     C 46,26 50,42 51,65
@@ -66,103 +48,91 @@ function VanillaPod({ maturity }) {
     C 27,115 26,88 27,65
     C 28,42 32,26 38,22 Z
   `
-
   return (
-    <motion.svg
-      viewBox="0 0 80 225"
-      fill="none"
-      className="w-full max-w-[64px]"
-    >
+    <motion.svg viewBox="0 0 80 225" fill="none" className="w-full max-w-[64px]">
       <defs>
         <radialGradient id="vanillaGrad" cx="35%" cy="35%" r="65%">
           <stop offset="0%" stopColor={c.highlight} stopOpacity="0.55" />
           <stop offset="100%" stopColor={c.fill} stopOpacity="0" />
         </radialGradient>
-        <filter id="vanillaBlur">
-          <feGaussianBlur stdDeviation="8" />
-        </filter>
       </defs>
-
-      {/* ── Ambient glow — adapts to maturity but always warm ── */}
-      <ellipse cx="40" cy="116" rx="28" ry="82"
-        fill={`rgba(${c.glowR},${c.glowG},${c.glowB},0.28)`}
-        filter="url(#vanillaBlur)" />
-      {/* Fixed base warm light — keeps pod visible at maximum curing */}
-      <ellipse cx="40" cy="116" rx="20" ry="65"
-        fill="rgba(140,100,30,0.18)"
-        filter="url(#vanillaBlur)" />
-
-      {/* Shadow */}
       <path d={podBody} fill={c.shadow} opacity="0.5" transform="translate(3,4)" />
-
-      {/* Main pod */}
       <path d={podBody} fill={c.fill} />
-
-      {/* Surface gradient sheen */}
       <path d={podBody} fill="url(#vanillaGrad)" />
-
-      {/* Highlight streak (left edge of pod surface) */}
-      <path
-        d="M 36,24 C 34,68 33,115 34,195"
-        stroke={c.highlight}
-        strokeWidth="1.5"
-        opacity="0.32"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Subtle secondary highlight */}
-      <path
-        d="M 38,24 C 37,80 36,130 37,194"
-        stroke={c.highlight}
-        strokeWidth="0.8"
-        opacity="0.15"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Natural longitudinal groove (vanilla beans have one central crease) */}
-      <path
-        d="M 40,24 C 40,80 40,135 40,196"
-        stroke={c.shadow}
-        strokeWidth="1.2"
-        opacity="0.4"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Bloom frost — crystalline vanillin deposits at high maturity */}
+      <path d="M 36,24 C 34,68 33,115 34,195"
+        stroke={c.highlight} strokeWidth="1.5" opacity="0.32" strokeLinecap="round" fill="none" />
+      <path d="M 40,24 C 40,80 40,135 40,196"
+        stroke={c.shadow} strokeWidth="1.2" opacity="0.4" strokeLinecap="round" fill="none" />
       {maturity > 60 && (
         <g opacity={c.bloomOpacity}>
           {[45, 68, 95, 125, 155, 178, 196].map((y, i) => (
-            <circle key={i}
-              cx={34 + (i % 3) * 5}
-              cy={y}
-              r="0.9"
-              fill="#E8DEC8"
-            />
+            <circle key={i} cx={34 + (i % 3) * 5} cy={y} r="0.9" fill="#E8DEC8" />
           ))}
-          {/* Extra frost specks at very high maturity */}
           {maturity > 85 && [55, 82, 108, 140, 168].map((y, i) => (
-            <circle key={i}
-              cx={42 + (i % 2) * 4}
-              cy={y}
-              r="0.7"
-              fill="#F0E8D5"
-            />
+            <circle key={i} cx={42 + (i % 2) * 4} cy={y} r="0.7" fill="#F0E8D5" />
           ))}
         </g>
       )}
-
-      {/* Stem */}
-      <path d="M38,14 Q40,8 42,14 L44,22 L36,22 Z"
-        fill={c.shadow} opacity="0.8" />
+      <path d="M38,14 Q40,8 42,14 L44,22 L36,22 Z" fill={c.shadow} opacity="0.8" />
       <path d="M39,14 Q40,9 41,14"
         stroke={c.highlight} strokeWidth="0.8" opacity="0.5" fill="none" />
-
-      {/* Tip */}
-      <ellipse cx="40" cy="202" rx="4" ry="2.5"
-        fill={c.shadow} opacity="0.6" />
+      <ellipse cx="40" cy="202" rx="4" ry="2.5" fill={c.shadow} opacity="0.6" />
     </motion.svg>
+  )
+}
+
+// ─── Simple Colombia map — outline + origin dots ──────────────────────────
+function VanillaMap({ selectedOrigin, onSelect }) {
+  return (
+    <div className="relative w-full max-w-[240px] mx-auto">
+      <svg viewBox="0 0 120 140" fill="none" className="w-full">
+        <path
+          d="M60 4 L72 6 L82 10 L88 16 L90 24 L86 28 L90 34 L92 42 L88 50
+             L90 56 L88 62 L86 68 L80 76 L78 84 L72 92 L68 100 L62 108
+             L56 116 L52 124 L50 132 L46 130 L44 122 L40 114 L36 108
+             L32 100 L28 92 L24 84 L22 76 L20 68 L18 60 L16 52 L20 44
+             L22 38 L18 30 L20 22 L24 16 L32 10 L42 6 Z"
+          fill="#0D1208"
+          stroke="#C9A84C"
+          strokeWidth="0.6"
+          strokeOpacity="0.3"
+        />
+        {VANILLA_ORIGINS.map((origin) => {
+          const x = (origin.x / 100) * 120
+          const y = (origin.y / 100) * 140
+          const isActive = selectedOrigin === origin.id
+          return (
+            <g key={origin.id} onClick={() => onSelect(origin.id)} style={{ cursor: 'pointer' }}>
+              {isActive && (
+                <motion.circle
+                  cx={x} cy={y} r="6" fill="none" stroke="#C9A84C" strokeWidth="0.8"
+                  initial={{ r: 3, opacity: 0.5 }}
+                  animate={{ r: 8, opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+              <circle
+                cx={x} cy={y}
+                r={isActive ? 3.5 : 2.5}
+                fill={isActive ? '#C9A84C' : '#E8DCC8'}
+                opacity={isActive ? 1 : 0.3}
+                className="transition-all duration-300"
+              />
+              <text
+                x={x + 5} y={y + 1}
+                fontSize="4.5"
+                fill={isActive ? '#C9A84C' : '#E8DCC8'}
+                opacity={isActive ? 0.9 : 0.25}
+                fontFamily="Cormorant Garamond, serif"
+                className="select-none"
+              >
+                {origin.name}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
   )
 }
 
@@ -188,7 +158,6 @@ export default function VanillaExperience() {
   const [origin, setOrigin] = useState('amazonia')
 
   const activeOrigin = VANILLA_ORIGINS.find((o) => o.id === origin)
-  const vc = getVanillaColors(maturity)
 
   return (
     <section
@@ -222,44 +191,7 @@ export default function VanillaExperience() {
           {/* ── Vanilla pod + controls ── */}
           <FadeIn delay={0.1}>
             <div className="flex flex-col items-center gap-12">
-              <div className="relative flex items-center justify-center h-64">
-                {/* Outer diffuse bloom — tall vertical halo matching pod shape */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '180px', height: '320px',
-                    background: `radial-gradient(ellipse, rgba(${vc.glowR},${vc.glowG},${vc.glowB},0.7) 0%, transparent 58%)`,
-                    filter: 'blur(50px)',
-                    opacity: 0.55,
-                  }}
-                />
-                {/* Mid halo — warm amber core */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '110px', height: '240px',
-                    background: `radial-gradient(ellipse, rgba(${vc.glowR},${vc.glowG},${vc.glowB},0.9) 0%, rgba(120,90,20,0.4) 48%, transparent 72%)`,
-                    filter: 'blur(26px)',
-                    opacity: 0.75,
-                  }}
-                />
-                {/* Inner bright core — the tight spotlight on the pod */}
-                <div className="absolute pointer-events-none transition-all duration-500"
-                  style={{
-                    width: '65px', height: '190px',
-                    background: `radial-gradient(ellipse, rgba(255,235,170,0.22) 0%, rgba(${vc.glowR},${vc.glowG},${vc.glowB},0.65) 40%, transparent 75%)`,
-                    filter: 'blur(12px)',
-                    opacity: 0.9,
-                  }}
-                />
-                {/* Fixed warm floor — always on, keeps pod visible at darkest curing */}
-                <div className="absolute pointer-events-none"
-                  style={{
-                    width: '130px', height: '260px',
-                    background: 'radial-gradient(ellipse, rgba(120,95,25,0.32) 0%, transparent 65%)',
-                    filter: 'blur(28px)',
-                  }}
-                />
-                <VanillaPod maturity={maturity} />
-              </div>
+              <VanillaPod maturity={maturity} />
 
               {/* Maturity slider */}
               <div className="w-full max-w-xs">
@@ -315,17 +247,11 @@ export default function VanillaExperience() {
             </div>
           </FadeIn>
 
-          {/* ── Colombia dept map + origin info ── */}
+          {/* ── Map + origin info ── */}
           <FadeIn delay={0.2}>
             <div className="flex flex-col items-center gap-8">
               <div className="section-label mb-0">Select Origin</div>
-
-              <ColombiaMap
-                origins={VANILLA_ORIGINS}
-                selectedOrigin={origin}
-                onSelect={setOrigin}
-                accentColor="#C9A84C"
-              />
+              <VanillaMap selectedOrigin={origin} onSelect={setOrigin} />
 
               <motion.div
                 key={origin}
@@ -344,7 +270,6 @@ export default function VanillaExperience() {
                 </p>
               </motion.div>
 
-              {/* Region pills */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {VANILLA_ORIGINS.map((o) => (
                   <button

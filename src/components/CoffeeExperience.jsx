@@ -1,17 +1,16 @@
 import React, { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import ColombiaMap from './ColombiaMap'
 
 const COFFEE_ORIGINS = [
   { id: 'sierra-nevada', name: 'Sierra Nevada', x: 62, y: 12,
     note: 'High altitude, snow-melt waters. Bright acidity, stone fruit finish.' },
-  { id: 'huila', name: 'Huila', x: 43, y: 58,
+  { id: 'huila', name: 'Huila', x: 43, y: 62,
     note: "Colombia's most decorated origin. Caramel sweetness, full body." },
-  { id: 'narino', name: 'Nariño', x: 26, y: 70,
+  { id: 'narino', name: 'Nariño', x: 30, y: 80,
     note: 'Extreme altitude, volcanic soils. Citrus brightness, clean cup.' },
-  { id: 'quindio', name: 'Quindío', x: 37, y: 50,
+  { id: 'quindio', name: 'Quindío', x: 40, y: 52,
     note: 'Coffee triangle heartland. Balanced, chocolatey, classic Colombian.' },
-  { id: 'tolima', name: 'Tolima', x: 41, y: 47,
+  { id: 'tolima', name: 'Tolima', x: 46, y: 48,
     note: 'Isolated terroirs, complex microclimates. Floral and nuanced.' },
 ]
 
@@ -25,7 +24,6 @@ function getBeanColor(roast) {
     fill: `rgb(${Math.round(light.r + (dark.r - light.r) * t)},${Math.round(light.g + (dark.g - light.g) * t)},${Math.round(light.b + (dark.b - light.b) * t)})`,
     highlight: `rgb(${Math.round(225 + (55 - 225) * t)},${Math.round(165 + (22 - 165) * t)},${Math.round(85 + (8 - 85) * t)})`,
     shadow: `rgb(${Math.round(105 + (10 - 105) * t)},${Math.round(68 + (4 - 68) * t)},${Math.round(30 + (2 - 30) * t)})`,
-    glow: `rgba(${Math.round(188 + (25 - 188) * t)},${Math.round(128 + (10 - 128) * t)},${Math.round(65 + (4 - 65) * t)}, 0.55)`,
   }
 }
 
@@ -39,42 +37,71 @@ function CoffeeBean({ roastValue }) {
           <stop offset="0%" stopColor={c.highlight} stopOpacity="0.5" />
           <stop offset="100%" stopColor={c.fill} stopOpacity="0" />
         </radialGradient>
-        <filter id="beanBlur">
-          <feGaussianBlur stdDeviation="10" />
-        </filter>
       </defs>
-
-      {/* Ambient glow — fixed warm base keeps bean visible at darkest roast */}
-      <ellipse cx="80" cy="112" rx="50" ry="78"
-        fill={c.glow} opacity="0.22" filter="url(#beanBlur)" />
-      <ellipse cx="80" cy="112" rx="38" ry="62"
-        fill="rgba(160,90,30,0.2)" filter="url(#beanBlur)" />
-
-      {/* Shadow offset */}
       <ellipse cx="84" cy="116" rx="50" ry="76" fill={c.shadow} opacity="0.5" />
-
-      {/* Bean body */}
       <ellipse cx="80" cy="112" rx="50" ry="76" fill={c.fill} />
-
-      {/* Surface radial highlight */}
       <ellipse cx="80" cy="112" rx="50" ry="76" fill="url(#beanGrad)" />
-
-      {/* Left highlight lobe */}
       <ellipse cx="60" cy="82" rx="15" ry="32" fill={c.highlight}
         opacity="0.3" transform="rotate(-12 60 82)" />
-
-      {/* Central crease — the coffee bean characteristic line */}
-      <path
-        d="M80,38 C72,72 72,110 80,148 C88,110 88,72 80,38"
-        fill={c.shadow} opacity="0.65"
-      />
-      {/* Crease highlight */}
-      <path
-        d="M80,42 C76,74 76,110 80,144"
-        stroke={c.highlight} strokeWidth="1" opacity="0.18"
-        strokeLinecap="round" fill="none"
-      />
+      <path d="M80,38 C72,72 72,110 80,148 C88,110 88,72 80,38" fill={c.shadow} opacity="0.65" />
+      <path d="M80,42 C76,74 76,110 80,144"
+        stroke={c.highlight} strokeWidth="1" opacity="0.18" strokeLinecap="round" fill="none" />
     </svg>
+  )
+}
+
+// ─── Simple Colombia map — outline + origin dots ──────────────────────────
+function ColombiaMap({ selectedOrigin, onSelect }) {
+  return (
+    <div className="relative w-full max-w-[260px] mx-auto">
+      <svg viewBox="0 0 120 140" fill="none" className="w-full">
+        <path
+          d="M60 4 L72 6 L82 10 L88 16 L90 24 L86 28 L90 34 L92 42 L88 50
+             L90 56 L88 62 L86 68 L80 76 L78 84 L72 92 L68 100 L62 108
+             L56 116 L52 124 L50 132 L46 130 L44 122 L40 114 L36 108
+             L32 100 L28 92 L24 84 L22 76 L20 68 L18 60 L16 52 L20 44
+             L22 38 L18 30 L20 22 L24 16 L32 10 L42 6 Z"
+          fill="#1A1208"
+          stroke="#C9A84C"
+          strokeWidth="0.6"
+          strokeOpacity="0.4"
+        />
+        {COFFEE_ORIGINS.map((origin) => {
+          const x = (origin.x / 100) * 120
+          const y = (origin.y / 100) * 140
+          const isActive = selectedOrigin === origin.id
+          return (
+            <g key={origin.id} onClick={() => onSelect(origin.id)} style={{ cursor: 'pointer' }}>
+              {isActive && (
+                <motion.circle
+                  cx={x} cy={y} r="6" fill="none" stroke="#C9A84C" strokeWidth="0.8"
+                  initial={{ r: 3, opacity: 0 }}
+                  animate={{ r: 7, opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+              <circle
+                cx={x} cy={y}
+                r={isActive ? 3.5 : 2.5}
+                fill={isActive ? '#C9A84C' : '#F5F0E8'}
+                opacity={isActive ? 1 : 0.35}
+                className="transition-all duration-300"
+              />
+              <text
+                x={x + 5} y={y + 1}
+                fontSize="4.5"
+                fill={isActive ? '#C9A84C' : '#F5F0E8'}
+                opacity={isActive ? 0.9 : 0.3}
+                fontFamily="Cormorant Garamond, serif"
+                className="transition-all duration-300 select-none"
+              >
+                {origin.name}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
   )
 }
 
@@ -101,7 +128,6 @@ export default function CoffeeExperience() {
 
   const roastIndex = roast < 34 ? 0 : roast < 67 ? 1 : 2
   const activeOrigin = COFFEE_ORIGINS.find((o) => o.id === origin)
-  const beanColors = getBeanColor(roast)
 
   return (
     <section
@@ -135,44 +161,7 @@ export default function CoffeeExperience() {
           {/* ── Bean + roast + quantity ── */}
           <FadeIn delay={0.1}>
             <div className="flex flex-col items-center gap-12">
-              <div className="relative flex items-center justify-center">
-                {/* Outer diffuse bloom */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '280px', height: '310px',
-                    background: `radial-gradient(ellipse, ${beanColors.glow} 0%, transparent 58%)`,
-                    filter: 'blur(52px)',
-                    opacity: 0.6,
-                  }}
-                />
-                {/* Mid halo — roast-toned */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '180px', height: '210px',
-                    background: `radial-gradient(ellipse, ${beanColors.glow} 0%, rgba(140,70,15,0.45) 45%, transparent 72%)`,
-                    filter: 'blur(28px)',
-                    opacity: 0.75,
-                  }}
-                />
-                {/* Inner bright core — soft white-amber hotspot */}
-                <div className="absolute pointer-events-none transition-all duration-500"
-                  style={{
-                    width: '110px', height: '130px',
-                    background: `radial-gradient(ellipse, rgba(255,225,160,0.2) 0%, ${beanColors.glow} 40%, transparent 75%)`,
-                    filter: 'blur(14px)',
-                    opacity: 0.9,
-                  }}
-                />
-                {/* Fixed warm floor — guarantees silhouette at full dark roast */}
-                <div className="absolute pointer-events-none"
-                  style={{
-                    width: '200px', height: '230px',
-                    background: 'radial-gradient(ellipse, rgba(130,70,15,0.3) 0%, transparent 65%)',
-                    filter: 'blur(32px)',
-                  }}
-                />
-                <CoffeeBean roastValue={roast} />
-              </div>
+              <CoffeeBean roastValue={roast} />
 
               {/* Roast slider */}
               <div className="w-full max-w-xs">
@@ -227,17 +216,11 @@ export default function CoffeeExperience() {
             </div>
           </FadeIn>
 
-          {/* ── Colombia dept map + origin info ── */}
+          {/* ── Map + origin info ── */}
           <FadeIn delay={0.2}>
             <div className="flex flex-col items-center gap-8">
               <div className="section-label mb-0">Select Origin</div>
-
-              <ColombiaMap
-                origins={COFFEE_ORIGINS}
-                selectedOrigin={origin}
-                onSelect={setOrigin}
-                accentColor="#C9A84C"
-              />
+              <ColombiaMap selectedOrigin={origin} onSelect={setOrigin} />
 
               <motion.div
                 key={origin}
@@ -256,7 +239,6 @@ export default function CoffeeExperience() {
                 </p>
               </motion.div>
 
-              {/* Region pills */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {COFFEE_ORIGINS.map((o) => (
                   <button

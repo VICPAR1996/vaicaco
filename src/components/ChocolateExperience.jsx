@@ -9,7 +9,6 @@ const CACAO_VARIETIES = [
     podHighlight: '#C4744E',
     podShadow: '#3D1A0C',
     ribColor: '#5C2A14',
-    glowColor: '#A0522D',
     note: 'The rarest. Floral, delicate, low bitterness. Found in isolated Colombian valleys.',
   },
   {
@@ -19,7 +18,6 @@ const CACAO_VARIETIES = [
     podHighlight: '#D04030',
     podShadow: '#4A0A0A',
     ribColor: '#6A1010',
-    glowColor: '#A01818',
     note: 'Complex and aromatic. A natural hybrid with deep fruity notes and nuanced tannins.',
   },
   {
@@ -29,7 +27,6 @@ const CACAO_VARIETIES = [
     podHighlight: '#72A862',
     podShadow: '#1E3018',
     ribColor: '#2E4828',
-    glowColor: '#4A7040',
     note: 'Robust and earthy. Bold, full-bodied intensity from Colombia\'s lowland valleys.',
   },
 ]
@@ -42,7 +39,6 @@ function getChocolateColor(value) {
     fill: `rgb(${Math.round(light.r + (dark.r - light.r) * t)},${Math.round(light.g + (dark.g - light.g) * t)},${Math.round(light.b + (dark.b - light.b) * t)})`,
     highlight: `rgb(${Math.round(220 + (65 - 220) * t)},${Math.round(155 + (28 - 155) * t)},${Math.round(85 + (10 - 85) * t)})`,
     shadow: `rgb(${Math.round(105 + (15 - 105) * t)},${Math.round(62 + (6 - 62) * t)},${Math.round(28 + (2 - 28) * t)})`,
-    glow: `rgba(${Math.round(185 + (35 - 185) * t)},${Math.round(118 + (14 - 118) * t)},${Math.round(65 + (5 - 65) * t)}, 0.5)`,
   }
 }
 
@@ -245,7 +241,6 @@ export default function ChocolateExperience() {
   const [tone, setTone] = useState(65)
   const [variety, setVariety] = useState('criollo')
   const activeVariety = CACAO_VARIETIES.find((v) => v.id === variety)
-  const barColors = getChocolateColor(tone)
 
   return (
     <section
@@ -280,42 +275,7 @@ export default function ChocolateExperience() {
           {/* ── Chocolate bar + tone slider ── */}
           <FadeIn delay={0.1}>
             <div className="flex flex-col items-center gap-10">
-              <div className="relative flex items-center justify-center w-full">
-                {/* Outer diffuse bloom — wide, very soft */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '420px', height: '260px',
-                    background: `radial-gradient(ellipse, ${barColors.glow} 0%, transparent 60%)`,
-                    filter: 'blur(48px)',
-                    opacity: 0.55,
-                  }}
-                />
-                {/* Mid halo — focused warmth */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '300px', height: '180px',
-                    background: `radial-gradient(ellipse, ${barColors.glow} 0%, rgba(180,90,20,0.4) 40%, transparent 70%)`,
-                    filter: 'blur(28px)',
-                    opacity: 0.7,
-                  }}
-                />
-                {/* Inner bright core — tight spotlight on the bar */}
-                <div className="absolute pointer-events-none transition-all duration-600"
-                  style={{
-                    width: '180px', height: '110px',
-                    background: `radial-gradient(ellipse, rgba(255,220,150,0.22) 0%, ${barColors.glow} 45%, transparent 75%)`,
-                    filter: 'blur(12px)',
-                    opacity: 0.9,
-                  }}
-                />
-                {/* Fixed warm floor — never lets bar go invisible */}
-                <div className="absolute pointer-events-none"
-                  style={{
-                    width: '320px', height: '190px',
-                    background: 'radial-gradient(ellipse, rgba(160,80,20,0.28) 0%, transparent 65%)',
-                    filter: 'blur(30px)',
-                  }}
-                />
+              <div className="flex items-center justify-center w-full">
                 <ChocolateBar tone={tone} />
               </div>
 
@@ -353,42 +313,7 @@ export default function ChocolateExperience() {
           {/* ── Cacao pod + variety selector ── */}
           <FadeIn delay={0.2}>
             <div className="flex flex-col items-center gap-10">
-              <div className="relative flex items-center justify-center h-60">
-                {/* Outer diffuse bloom */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '260px', height: '330px',
-                    background: `radial-gradient(ellipse, ${activeVariety.glowColor}88 0%, transparent 60%)`,
-                    filter: 'blur(50px)',
-                    opacity: 0.6,
-                  }}
-                />
-                {/* Mid focused halo */}
-                <div className="absolute pointer-events-none transition-all duration-700"
-                  style={{
-                    width: '170px', height: '240px',
-                    background: `radial-gradient(ellipse, ${activeVariety.podHighlight}99 0%, ${activeVariety.glowColor}55 50%, transparent 75%)`,
-                    filter: 'blur(26px)',
-                    opacity: 0.65,
-                  }}
-                />
-                {/* Inner bright core — tight pod-shaped spotlight */}
-                <div className="absolute pointer-events-none transition-all duration-500"
-                  style={{
-                    width: '100px', height: '170px',
-                    background: `radial-gradient(ellipse, rgba(255,210,140,0.18) 0%, ${activeVariety.podHighlight}66 40%, transparent 75%)`,
-                    filter: 'blur(14px)',
-                    opacity: 0.85,
-                  }}
-                />
-                {/* Fixed warm floor */}
-                <div className="absolute pointer-events-none"
-                  style={{
-                    width: '150px', height: '220px',
-                    background: 'radial-gradient(ellipse, rgba(150,90,40,0.25) 0%, transparent 65%)',
-                    filter: 'blur(22px)',
-                  }}
-                />
+              <div className="flex items-center justify-center h-60">
                 <CacaoPod variety={variety} />
               </div>
 
